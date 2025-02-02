@@ -1,0 +1,37 @@
+import streamlit as st
+import pandas as pd
+
+# upload a excel file
+uploaded_file = st.file_uploader("Upload an Excel file", type="xlsx")
+
+if uploaded_file is not None:
+    # Initialize the dataframe in session state if it doesn't exist
+    if 'df' not in st.session_state:
+        st.session_state.df = pd.read_excel(uploaded_file)
+    
+    # Display the current dataframe
+    st.dataframe(st.session_state.df)
+
+    # Create an editable dataframe for new rows
+    if 'df_editable' not in st.session_state:
+        st.session_state.df_editable = pd.DataFrame(columns=['Date', 'Code', 'Name'])
+
+    # Button to add a new empty row
+    if st.button('Add Row :heavy_dollar_sign:'):
+        new_row = pd.DataFrame([[None, None, None]], columns=['Date', 'Code', 'Name'])
+        st.session_state.df_editable = pd.concat([st.session_state.df_editable, new_row], ignore_index=True)
+
+    # Display editable dataframe
+    st.session_state.df_editable = st.data_editor(st.session_state.df_editable)
+
+    # Submit button to save changes
+    if st.button('Submit :gift:'):
+        st.session_state.df = pd.concat([st.session_state.df, st.session_state.df_editable], ignore_index=True)
+        st.session_state.df_editable = pd.DataFrame(columns=['Date', 'Code', 'Name'])  # Clear the editable dataframe
+        st.success('Data added successfully!')
+        # display the updated dataframe
+        st.dataframe(st.session_state.df)
+
+    # create a button to  
+
+
